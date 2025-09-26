@@ -12,6 +12,25 @@ export default function Checkout() {
     setTotal(stored.reduce((sum, item) => sum + item.price, 0));
   }, []);
 
+  // Function to get appropriate emoji based on category
+  const getCategoryEmoji = (category) => {
+    if (!category) return "🍽️";
+    
+    const categoryLower = category.toLowerCase();
+    
+    if (categoryLower.includes("meal") || categoryLower.includes("food") || categoryLower.includes("main")) {
+      return "🍽️";
+    } else if (categoryLower.includes("drink") || categoryLower.includes("beverage")) {
+      return "🥤";
+    } else if (categoryLower.includes("snack") || categoryLower.includes("appetizer")) {
+      return "🍿";
+    } else if (categoryLower.includes("dessert") || categoryLower.includes("sweet")) {
+      return "🍰";
+    } else {
+      return "🍽️"; // default
+    }
+  };
+
   const handleCheckout = async () => {
     try {
       const res = await axios.post("/api/checkout", {
@@ -85,10 +104,10 @@ export default function Checkout() {
                 {cart.map((item, i) => (
                   <div key={i} className={styles.item}>
                     <div className={styles.itemInfo}>
-                      <div className={styles.itemImage}>🍽️</div>
+                      <div className={styles.itemImage}>{getCategoryEmoji(item.category)}</div>
                       <div className={styles.itemDetails}>
                         <span className={styles.itemName}>{item.name}</span>
-                        <span className={styles.itemCategory}>Main Course</span>
+                        <span className={styles.itemCategory}>{item.category || "Main Course"}</span>
                       </div>
                     </div>
                     <span className={styles.itemPrice}>Rp {item.price.toLocaleString()}</span>
@@ -97,9 +116,9 @@ export default function Checkout() {
               </div>
 
               <div className={styles.totalSection}>
-                <div className={styles.totalRow}>
-                  <span className={styles.totalLabel}>Total</span>
-                  <span className={styles.totalValue}>Rp {total.toLocaleString()}</span>
+                <div className={styles.finalTotal}>
+                  <span className={styles.finalLabel}>Total</span>
+                  <span className={styles.finalValue}>Rp {total.toLocaleString()}</span>
                 </div>
               </div>
             </div>

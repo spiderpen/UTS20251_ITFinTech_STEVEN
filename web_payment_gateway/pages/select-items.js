@@ -67,9 +67,11 @@ export default function SelectItems() {
       <nav className={styles.navbar}>
         <div className={styles.navContainer}>
           <div className={styles.brand}>
-            <div className={styles.brandIcon}>🍽️</div>
-            <h1 className={styles.brandName}>Millenium Jaya</h1>
-            <span className={styles.brandTagline}>Premium Dining</span>
+            <div className={styles.brandIcon}>👑</div>
+            <div>
+              <h1 className={styles.brandName}>Millenium Jaya</h1>
+              <span className={styles.brandTagline}>Premium Dining</span>
+            </div>
           </div>
 
           <div className={styles.cartWrapper}>
