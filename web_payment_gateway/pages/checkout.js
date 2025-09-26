@@ -32,27 +32,27 @@ export default function Checkout() {
   };
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Checkout</h1>
-      {cart.length === 0 ? (
-        <p>No items in cart.</p>
-      ) : (
-        <>
-          {cart.map((item, i) => (
-            <div key={i} className={styles.item}>
-              <span>{item.name}</span>
-              <span className={styles.price}>Rp {item.price}</span>
-            </div>
-          ))}
-          <div className={styles.total}>
-            <span>Total</span>
-            <span>Rp {total}</span>
-          </div>
-          <button onClick={handleCheckout} className={styles.button}>
-            Continue to Payment →
-          </button>
-        </>
-      )}
-    </div>
+    <>
+      <div className="header">Millenium Jaya</div> {/* brand di atas */}
+      <div className="container">
+        <h1>Checkout</h1>
+        {cart.length === 0 ? (
+          <p>No items in cart.</p>
+        ) : (
+          <>
+            {cart.map((item, i) => (
+              <div key={i} className={styles.item}>
+                <span>{item.name}</span>
+                <span>Rp {item.price}</span>
+              </div>
+            ))}
+            <p className={styles.total}>Total: Rp {total}</p>
+            <button onClick={handleCheckout} className={styles.checkoutBtn}>
+              Continue to Payment →
+            </button>
+          </>
+        )}
+      </div>
+    </>
   );
 }

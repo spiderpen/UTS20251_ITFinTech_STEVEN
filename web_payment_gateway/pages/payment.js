@@ -9,9 +9,10 @@ export default function Payment() {
     setLoading(true);
     try {
       const checkoutId = localStorage.getItem("checkoutId") || "demo-checkout-1";
+
       const res = await axios.post("/api/payment", {
         checkoutId,
-        amount: 20000, // sementara masih dummy
+        amount: 20000, // dummy
       });
 
       if (res.data.success) {
@@ -27,15 +28,18 @@ export default function Payment() {
   };
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Payment</h1>
-      <button
-        onClick={handlePayment}
-        disabled={loading}
-        className={styles.button}
-      >
-        {loading ? "Processing..." : "Pay with Xendit"}
-      </button>
-    </div>
+    <>
+      <div className="header">Millenium Jaya</div>
+      <div className="container">
+        <h1>Payment</h1>
+        <button
+          onClick={handlePayment}
+          disabled={loading}
+          className={styles.payBtn}
+        >
+          {loading ? "Processing..." : "Pay with Xendit"}
+        </button>
+      </div>
+    </>
   );
 }

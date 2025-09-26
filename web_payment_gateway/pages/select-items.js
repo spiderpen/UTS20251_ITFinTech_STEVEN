@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import styles from "../styles/selectItems.module.css";
+import styles from "../styles/selectitems.module.css";
 
 export default function SelectItems() {
   const [products, setProducts] = useState([]);
@@ -19,27 +19,23 @@ export default function SelectItems() {
   };
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Select Items</h1>
-      <div className={styles.grid}>
-        {products.map((p) => (
-          <div key={p._id} className={styles.card}>
-            <div>
-              <h2 className={styles.name}>{p.name}</h2>
-              <p className={styles.price}>Rp {p.price}</p>
+    <>
+      <div className="header">Millenium Jaya</div>
+      <div className="container">
+        <h1>Select Items</h1>
+        <div className={styles.grid}>
+          {products.map((p) => (
+            <div key={p._id} className={styles.card}>
+              <h2>{p.name}</h2>
+              <p>Rp {p.price}</p>
+              <button onClick={() => addToCart(p)}>Add +</button>
             </div>
-            <button
-              className={styles.button}
-              onClick={() => addToCart(p)}
-            >
-              Add +
-            </button>
-          </div>
-        ))}
+          ))}
+        </div>
+        <a href="/checkout" className={styles.checkoutLink}>
+          Go to Checkout →
+        </a>
       </div>
-      <a href="/checkout" className={styles.checkoutLink}>
-        Go to Checkout →
-      </a>
-    </div>
+    </>
   );
 }

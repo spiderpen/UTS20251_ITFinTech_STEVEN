@@ -1,53 +1,41 @@
-/* 🎨 Variabel warna global */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --muted: #f9f9f9;
-  --border: #e0e0e0;
-  --primary: #2563eb; /* biru */
-  --secondary: #16a34a; /* hijau */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --muted: #1a1a1a;
-    --border: #333;
-    --primary: #3b82f6;
-    --secondary: #22c55e;
-  }
-}
-
-/* 🔄 Reset umum */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  height: 100%;
+  --background: #f9fafb;
+  --foreground: #1f2937;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --accent: #f3f4f6;
+  --border: #e5e7eb;
 }
 
 body {
-  color: var(--foreground);
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
+  color: var(--foreground);
+  margin: 0;
+  padding: 0; /* reset supaya header full */
 }
 
-/* 🔗 Link */
-a {
+.header {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 700;
   color: var(--primary);
-  text-decoration: none;
+  padding: 1rem;
+  border-bottom: 2px solid var(--border);
+  background: #fff;
+  margin-bottom: 2rem;
 }
 
-a:hover {
-  text-decoration: underline;
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+  background: var(--accent);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
