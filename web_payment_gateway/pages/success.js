@@ -1,58 +1,60 @@
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import axios from "axios";
 import styles from "../styles/success.module.css";
 
 export default function Success() {
-  const router = useRouter();
-  const { checkoutId } = router.query;
-
   const [orderDetails, setOrderDetails] = useState(null);
   const [orderId, setOrderId] = useState("");
 
   useEffect(() => {
-    if (!checkoutId) return;
-
-    // Ambil data order dari API menggunakan checkoutId
-    axios
-      .get(`/api/getCheckout?checkoutId=${checkoutId}`)
-      .then((res) => {
-        const checkout = res.data.checkout;
-
-        if (checkout) {
-          setOrderDetails({
-            _id: checkout._id,
-            items: checkout.items,
-            totalPrice: checkout.totalPrice,
-            status: checkout.status,
-          });
-
-          const shortId = checkout._id.toString().slice(-8).toUpperCase();
-          setOrderId(shortId);
-        }
-      })
-      .catch((err) => {
-        console.error("Error fetching order:", err);
+    // Ambil data cart dari localStorage sebelum dihapus
+    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const storedCheckoutId = localStorage.getItem("checkoutId");
+    
+    if (storedCart.length > 0) {
+      const total = storedCart.reduce((sum, item) => sum + item.price, 0);
+      
+      setOrderDetails({
+        _id: storedCheckoutId || Date.now().toString(),
+        items: storedCart,
+        totalPrice: total,
+        status: "COMPLETED"
       });
-  }, [checkoutId]);
+      
+      // Generate order ID yang user friendly
+      const shortId = (storedCheckoutId || Date.now().toString()).slice(-8).toUpperCase();
+      setOrderId(shortId);
+    }
+    
+    // Clear cart dan checkoutId setelah payment berhasil
+    localStorage.removeItem("cart");
+    localStorage.removeItem("checkoutId");
+  }, []);
 
   // Function to get appropriate emoji based on category
   const getCategoryEmoji = (category) => {
     if (!category) return "🍽️";
-    const c = category.toLowerCase();
-    if (c.includes("meal") || c.includes("food") || c.includes("main")) return "🍽️";
-    if (c.includes("drink") || c.includes("beverage")) return "🥤";
-    if (c.includes("snack") || c.includes("appetizer")) return "🍿";
-    if (c.includes("dessert") || c.includes("sweet")) return "🍰";
-    return "🍽️";
+    
+    const categoryLower = category.toLowerCase();
+    
+    if (categoryLower.includes("meal") || categoryLower.includes("food") || categoryLower.includes("main")) {
+      return "🍽️";
+    } else if (categoryLower.includes("drink") || categoryLower.includes("beverage")) {
+      return "🥤";
+    } else if (categoryLower.includes("snack") || categoryLower.includes("appetizer")) {
+      return "🍿";
+    } else if (categoryLower.includes("dessert") || categoryLower.includes("sweet")) {
+      return "🍰";
+    } else {
+      return "🍽️"; // default
+    }
   };
 
   const goBackToMenu = () => {
-    router.push("/select-items");
+    window.location.href = "/select-items";
   };
 
   const goHome = () => {
-    router.push("/");
+    window.location.href = "/";
   };
 
   return (
@@ -66,9 +68,20 @@ export default function Success() {
               <span className={styles.brandTagline}>Premium Dining</span>
             </div>
           </div>
+
+          <div className={styles.cartWrapper}>
+            <div className={styles.cartIcon}>
+              <svg className={styles.cartSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="m1 1 4 4 12.68 3.17a2 2 0 0 1 1.32 2.23l-.84 5a2 2 0 0 1-2 1.6H6"></path>
+              </svg>
+              <span className={styles.cartBadge}>0</span>
+            </div>
+          </div>
         </div>
       </nav>
-
+      
       <main className={styles.container}>
         <div className={styles.successWrapper}>
           <div className={styles.successCard}>
@@ -86,16 +99,17 @@ export default function Success() {
               <p className={styles.successMessage}>
                 Thank you for your order. Your payment has been processed successfully.
               </p>
-
+              
               {orderDetails ? (
                 <div className={styles.orderInfo}>
                   <div className={styles.orderNumber}>
                     <span className={styles.orderLabel}>Order ID:</span>
                     <span className={styles.orderValue}>#{orderId}</span>
                   </div>
-
+                  
                   <div className={styles.orderSummary}>
                     <h3 className={styles.summaryTitle}>Order Summary</h3>
+                    
                     <div className={styles.itemsList}>
                       {orderDetails.items?.map((item, i) => (
                         <div key={i} className={styles.item}>
@@ -121,7 +135,7 @@ export default function Success() {
                 </div>
               ) : (
                 <div className={styles.noOrderData}>
-                  <p>Loading order details...</p>
+                  <p>Order completed successfully!</p>
                 </div>
               )}
 
@@ -133,7 +147,7 @@ export default function Success() {
                     <span className={styles.stepDesc}>Receipt sent to your email</span>
                   </div>
                 </div>
-
+                
                 <div className={styles.stepItem}>
                   <div className={styles.stepIcon}>🍳</div>
                   <div className={styles.stepText}>
@@ -141,7 +155,7 @@ export default function Success() {
                     <span className={styles.stepDesc}>Your order is being prepared</span>
                   </div>
                 </div>
-
+                
                 <div className={styles.stepItem}>
                   <div className={styles.stepIcon}>🚀</div>
                   <div className={styles.stepText}>
@@ -157,6 +171,7 @@ export default function Success() {
                 <span className={styles.buttonIcon}>🏠</span>
                 Go Home
               </button>
+              
               <button onClick={goBackToMenu} className={styles.menuButton}>
                 <span className={styles.buttonIcon}>🍽️</span>
                 Order Again

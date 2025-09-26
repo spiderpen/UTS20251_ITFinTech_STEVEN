@@ -6,7 +6,8 @@ import axios from "axios";
 export default async function handler(req, res) {
   await dbConnect();
 
-  if (req.method !== "POST") return res.status(405).json({ message: "Method Not Allowed" });
+  if (req.method !== "POST") 
+    return res.status(405).json({ message: "Method Not Allowed" });
 
   try {
     const { items, totalPrice } = req.body;
@@ -15,9 +16,16 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: "Items and totalPrice required" });
     }
 
+    // ✅ Pastikan items punya name, category, price
+    const formattedItems = items.map(item => ({
+      name: item.name || "Unnamed Item",
+      category: item.category || "Main Course",
+      price: Number(item.price) || 0,
+    }));
+
     const checkout = await Checkout.create({
-      items,
-      totalPrice,
+      items: formattedItems,
+      totalPrice: Number(totalPrice),
       status: "PENDING",
     });
 
@@ -31,7 +39,7 @@ export default async function handler(req, res) {
       "https://api.xendit.co/v2/invoices",
       {
         external_id: `checkout-${checkout._id}-${Date.now()}`,
-        amount: totalPrice,
+        amount: Number(totalPrice),
         payer_email: "customer@example.com",
         description: `Payment for Millenium Jaya - Order ${checkout._id.toString().slice(-8).toUpperCase()}`,
         currency: "IDR",
@@ -49,7 +57,7 @@ export default async function handler(req, res) {
       checkoutId: checkout._id,
       xenditInvoiceId: invoice.id,
       xenditInvoiceUrl: invoice.invoice_url,
-      amount: totalPrice,
+      amount: Number(totalPrice),
       status: invoice.status || "PENDING",
       expiryDate: invoice.expiry_date ? new Date(invoice.expiry_date) : undefined,
     });
