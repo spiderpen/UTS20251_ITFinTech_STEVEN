@@ -106,7 +106,10 @@ export default function Checkout() {
       });
 
       if (res.data.success) {
-        localStorage.setItem("checkoutId", res.data.payment.checkoutId);
+        localStorage.setItem("checkoutId", res.data.checkout._id);
+        // Redirect ke success page dengan checkoutId sebagai parameter
+        const successUrl = `/success?checkoutId=${res.data.checkout._id}`;
+        localStorage.setItem("successUrl", successUrl);
         window.location.href = res.data.invoice.invoice_url;
       } else {
         alert("Gagal membuat invoice: " + JSON.stringify(res.data.error));
