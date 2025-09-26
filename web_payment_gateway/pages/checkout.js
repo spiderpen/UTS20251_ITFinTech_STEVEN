@@ -98,16 +98,8 @@ export default function Checkout() {
 
               <div className={styles.totalSection}>
                 <div className={styles.totalRow}>
-                  <span className={styles.totalLabel}>Subtotal</span>
+                  <span className={styles.totalLabel}>Total</span>
                   <span className={styles.totalValue}>Rp {total.toLocaleString()}</span>
-                </div>
-                <div className={styles.totalRow}>
-                  <span className={styles.totalLabel}>Tax (10%)</span>
-                  <span className={styles.totalValue}>Rp {(total * 0.1).toLocaleString()}</span>
-                </div>
-                <div className={styles.finalTotal}>
-                  <span className={styles.finalLabel}>Total</span>
-                  <span className={styles.finalValue}>Rp {(total * 1.1).toLocaleString()}</span>
                 </div>
               </div>
             </div>

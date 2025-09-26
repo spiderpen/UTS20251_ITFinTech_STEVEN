@@ -1,0 +1,434 @@
+/* Navbar styles - sama dengan checkout */
+.navbar {
+    background: #ffffff;
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .navContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 72px;
+  }
+  
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .brandIcon {
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+  
+  .brandName {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .brandTagline {
+    font-size: 0.75rem;
+    color: var(--secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Main container */
+  .container {
+    min-height: calc(100vh - 72px);
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 2rem 1rem;
+  }
+  
+  .successWrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 200px);
+  }
+  
+  .successCard {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    padding: 3rem 2rem;
+    text-align: center;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .successCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--success), #34d399);
+  }
+  
+  /* Success icon animation */
+  .successIcon {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .checkmarkCircle {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .checkmarkCircleStroke {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: var(--success);
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+  }
+  
+  .checkmark {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 2;
+    stroke: var(--success);
+    stroke-miterlimit: 10;
+    margin: 0 auto;
+    box-shadow: inset 0 0 0 var(--success);
+  }
+  
+  .checkmarkCheck {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+  }
+  
+  @keyframes stroke {
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  
+  /* Success content */
+  .successContent {
+    margin-bottom: 2rem;
+  }
+  
+  .successTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0 0 1rem 0;
+  }
+  
+  .successMessage {
+    font-size: 1.1rem;
+    color: var(--secondary);
+    margin: 0 0 2rem 0;
+    line-height: 1.6;
+  }
+  
+  /* Order info */
+  .orderInfo {
+    background: var(--accent);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    border: 1px solid var(--border);
+  }
+  
+  .orderNumber {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  
+  .orderLabel {
+    font-weight: 500;
+    color: var(--secondary);
+  }
+  
+  .orderValue {
+    font-weight: 700;
+    color: var(--primary);
+    font-family: monospace;
+    font-size: 1.1rem;
+  }
+  
+  /* Order summary styles - sama dengan checkout */
+  .orderSummary {
+    text-align: left;
+  }
+  
+  .summaryTitle {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: var(--foreground);
+  }
+  
+  .itemsList {
+    margin-bottom: 1.5rem;
+  }
+  
+  .item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .item:last-child {
+    border-bottom: none;
+  }
+  
+  .itemInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+  }
+  
+  .itemImage {
+    font-size: 2rem;
+    filter: grayscale(0.3);
+  }
+  
+  .itemDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .itemName {
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  
+  .itemCategory {
+    font-size: 0.875rem;
+    color: var(--secondary);
+  }
+  
+  .itemPrice {
+    font-weight: 600;
+    color: var(--foreground);
+    font-size: 1.1rem;
+  }
+  
+  .totalSection {
+    border-top: 2px solid var(--border);
+    padding-top: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .totalRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .totalLabel {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  
+  .totalValue {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--success);
+  }
+  
+  /* No order data */
+  .noOrderData {
+    padding: 2rem 1rem;
+    text-align: center;
+    background: var(--accent);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+  
+  .noOrderData p {
+    margin: 0;
+    color: var(--secondary);
+    font-size: 1.1rem;
+  }
+  
+  /* Next steps */
+  .nextSteps {
+    text-align: left;
+    margin: 2rem 0;
+  }
+  
+  .stepItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+  }
+  
+  .stepItem:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+  }
+  
+  .stepIcon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 1px solid var(--border);
+  }
+  
+  .stepText {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .stepTitle {
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  
+  .stepDesc {
+    font-size: 0.875rem;
+    color: var(--secondary);
+  }
+  
+  /* Action buttons */
+  .actionButtons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  
+  .homeButton,
+  .menuButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  
+  .homeButton {
+    background: var(--accent);
+    color: var(--secondary);
+    border: 2px solid var(--border);
+  }
+  
+  .homeButton:hover {
+    background: #ffffff;
+    color: var(--foreground);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+  }
+  
+  .menuButton {
+    background: linear-gradient(135deg, var(--success), var(--success-hover));
+    color: #ffffff;
+    border: 2px solid var(--success);
+  }
+  
+  .menuButton:hover {
+    background: linear-gradient(135deg, var(--success-hover), #047857);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .buttonIcon {
+    font-size: 1.2rem;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .container {
+      padding: 1rem 0.5rem;
+    }
+    
+    .successCard {
+      padding: 2rem 1rem;
+      margin: 0 0.5rem;
+    }
+    
+    .successTitle {
+      font-size: 1.5rem;
+    }
+    
+    .actionButtons {
+      flex-direction: column;
+    }
+    
+    .homeButton,
+    .menuButton {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .orderNumber {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .stepItem {
+      padding: 0.75rem;
+    }
+    
+    .itemInfo {
+      gap: 0.75rem;
+    }
+    
+    .itemImage {
+      font-size: 1.5rem;
+    }
+  }

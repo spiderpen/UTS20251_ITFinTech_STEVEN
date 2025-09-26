@@ -11,7 +11,15 @@ export default async function handler(req, res) {
       const { items, totalPrice } = req.body;
 
       if (!items || !totalPrice) {
-        return res.status(400).json({ success: false, error: "Items and totalPrice required" });
+        return res
+          .status(400)
+          .json({ success: false, error: "Items and totalPrice required" });
+      }
+
+      if (typeof totalPrice !== "number" || totalPrice <= 0) {
+        return res
+          .status(400)
+          .json({ success: false, error: "totalPrice must be a number > 0" });
       }
 
       // 1️⃣ Buat checkout record
@@ -28,10 +36,12 @@ export default async function handler(req, res) {
           external_id: `checkout-${checkout._id}-${Date.now()}`,
           amount: totalPrice,
           payer_email: "customer@example.com",
-          description: `Payment for checkout ${checkout._id}`,
+          description: `Payment for Millenium Jaya - Order ${checkout._id.toString().slice(-8).toUpperCase()}`,
           currency: "IDR",
-          success_redirect_url: process.env.SUCCESS_REDIRECT_URL || "http://localhost:3000/success",
-          failure_redirect_url: process.env.FAILED_REDIRECT_URL || "http://localhost:3000/failed",
+          success_redirect_url:
+            process.env.SUCCESS_REDIRECT_URL || "http://localhost:3000/success",
+          failure_redirect_url:
+            process.env.FAILED_REDIRECT_URL || "http://localhost:3000/checkout",
         },
         {
           auth: {
@@ -45,15 +55,25 @@ export default async function handler(req, res) {
 
       // 3️⃣ Simpan Payment record
       const payment = await Payment.create({
-        checkoutId: checkout._id.toString(),
+        checkoutId: checkout._id,
         xenditInvoiceId: invoice.id,
         xenditInvoiceUrl: invoice.invoice_url,
         amount: totalPrice,
         status: invoice.status || "PENDING",
-        expiryDate: invoice.expiry_date ? new Date(invoice.expiry_date) : undefined,
+        expiryDate: invoice.expiry_date
+          ? new Date(invoice.expiry_date)
+          : undefined,
       });
 
-      return res.status(200).json({ success: true, checkout, invoice, payment });
+      console.log("✅ Checkout created:", {
+        checkoutId: checkout._id,
+        invoiceId: invoice.id,
+        amount: totalPrice
+      });
+
+      return res
+        .status(200)
+        .json({ success: true, checkout, invoice, payment });
     } catch (err) {
       console.error("❌ Checkout error:", err.response?.data || err.message);
       return res.status(err.response?.status || 500).json({

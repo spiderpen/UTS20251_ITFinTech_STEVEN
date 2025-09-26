@@ -1,60 +1,18 @@
 import mongoose from "mongoose";
 
-const PaymentSchema = new mongoose.Schema(
-  {
-    // Invoice ID dari Xendit (unik untuk setiap pembayaran)
-    xenditInvoiceId: {
-      type: String,
-      required: true,
-      unique: true,
-      index: true,
-    },
-
-    // ID order internal Anda (misalnya order_123)
-    externalId: {
-      type: String,
-      required: true,
-    },
-
-    // Jumlah pembayaran
-    amount: {
-      type: Number,
-      required: true,
-    },
-
-    // Status pembayaran: default PENDING
-    status: {
-      type: String,
-      enum: ["PENDING", "PAID", "EXPIRED", "FAILED"],
-      default: "PENDING",
-    },
-
-    // Waktu invoice dibuat
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-
-    // Waktu terakhir status berubah (diupdate oleh webhook)
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
-
-    // Info tambahan dari Xendit (misalnya channel pembayaran)
-    paymentMethod: {
-      type: String,
-    },
-
-    // Detail raw response dari Xendit (untuk debugging / log)
-    rawResponse: {
-      type: Object,
-    },
+const PaymentSchema = new mongoose.Schema({
+  checkoutId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "Checkout",
+    required: true,
+    // otomatis cast string ke ObjectId jika perlu
   },
-  {
-    timestamps: true, // otomatis tambahkan createdAt & updatedAt
-  }
-);
+  xenditInvoiceId: { type: String, required: true, unique: true },
+  xenditInvoiceUrl: { type: String, required: true },
+  amount: { type: Number, required: true },
+  status: { type: String, default: "PENDING" },
+  expiryDate: { type: Date },
+}, { timestamps: true });
 
-// Cegah recompile model saat hot-reload (Next.js)
+// Cek model existing, kalau sudah ada gunakan yang sudah ada
 export default mongoose.models.Payment || mongoose.model("Payment", PaymentSchema);
