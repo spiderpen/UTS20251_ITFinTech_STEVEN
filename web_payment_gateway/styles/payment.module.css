@@ -1,0 +1,37 @@
+.container {
+    max-width: 420px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+  }
+  
+  .button {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .button:hover {
+    background: #1e40af;
+  }
+  
+  .button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
+  

@@ -1,0 +1,71 @@
+.container {
+    max-width: 640px;
+    margin: 2rem auto;
+    padding: 1rem;
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .card {
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 1rem;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+  }
+  
+  .card:hover {
+    transform: translateY(-3px);
+  }
+  
+  .name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  
+  .price {
+    color: #2563eb;
+    font-weight: bold;
+    margin-bottom: 0.75rem;
+  }
+  
+  .button {
+    margin-top: auto;
+    background: #16a34a;
+    color: white;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .button:hover {
+    background: #15803d;
+  }
+  
+  .checkoutLink {
+    display: block;
+    margin-top: 2rem;
+    text-align: center;
+    font-weight: bold;
+    color: #2563eb;
+    text-decoration: underline;
+  }
+  

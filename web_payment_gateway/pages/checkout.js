@@ -1,77 +1,58 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import styles from "../styles/checkout.module.css";
 
 export default function Checkout() {
   const [cart, setCart] = useState([]);
-  const [subtotal, setSubtotal] = useState(0);
-  const taxRate = 0.1; // contoh 10%
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("cart") || "[]");
     setCart(stored);
-    setSubtotal(stored.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0));
+    setTotal(stored.reduce((sum, item) => sum + item.price, 0));
   }, []);
 
-  const updateQty = (i, delta) => {
-    const updated = [...cart];
-    updated[i].quantity = Math.max(1, (updated[i].quantity || 1) + delta);
-    setCart(updated);
-    localStorage.setItem("cart", JSON.stringify(updated));
-    setSubtotal(updated.reduce((sum, it) => sum + it.price * it.quantity, 0));
-  };
-
   const handleCheckout = async () => {
-    const res = await axios.post("/api/checkout", {
-      items: cart,
-      totalPrice: subtotal + subtotal * taxRate,
-    });
-    localStorage.setItem("checkoutId", res.data.checkout._id);
-    window.location.href = "/payment";
-  };
+    try {
+      const res = await axios.post("/api/checkout", {
+        items: cart,
+        totalPrice: total,
+      });
 
-  const tax = subtotal * taxRate;
-  const total = subtotal + tax;
+      if (res.data.success) {
+        localStorage.setItem("checkoutId", res.data.payment.checkoutId);
+        window.location.href = res.data.invoice.invoice_url;
+      } else {
+        alert("Gagal membuat invoice: " + JSON.stringify(res.data.error));
+      }
+    } catch (err) {
+      console.error("❌ Checkout error:", err);
+      alert("Terjadi kesalahan saat checkout.");
+    }
+  };
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <button onClick={() => history.back()} className="text-blue-600 mb-4">
-        ← Back
-      </button>
-      <h1 className="text-xl font-bold mb-4">Checkout</h1>
-
-      {cart.map((item, i) => (
-        <div key={i} className="flex justify-between items-center mb-3">
-          <span>{item.name}</span>
-          <div className="flex items-center">
-            <button
-              onClick={() => updateQty(i, -1)}
-              className="px-2 border rounded"
-            >
-              -
-            </button>
-            <span className="px-2">{item.quantity || 1}</span>
-            <button
-              onClick={() => updateQty(i, 1)}
-              className="px-2 border rounded"
-            >
-              +
-            </button>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Checkout</h1>
+      {cart.length === 0 ? (
+        <p>No items in cart.</p>
+      ) : (
+        <>
+          {cart.map((item, i) => (
+            <div key={i} className={styles.item}>
+              <span>{item.name}</span>
+              <span className={styles.price}>Rp {item.price}</span>
+            </div>
+          ))}
+          <div className={styles.total}>
+            <span>Total</span>
+            <span>Rp {total}</span>
           </div>
-          <span>Rp {item.price}</span>
-        </div>
-      ))}
-
-      <hr className="my-3" />
-      <p>Subtotal: Rp {subtotal}</p>
-      <p>Tax (10%): Rp {tax}</p>
-      <p className="font-bold">Total: Rp {total}</p>
-
-      <button
-        onClick={handleCheckout}
-        className="mt-4 w-full bg-green-500 text-white py-2 rounded"
-      >
-        Continue to Payment →
-      </button>
+          <button onClick={handleCheckout} className={styles.button}>
+            Continue to Payment →
+          </button>
+        </>
+      )}
     </div>
   );
 }

@@ -1,13 +1,29 @@
+/* 🎨 Variabel warna global */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --muted: #f9f9f9;
+  --border: #e0e0e0;
+  --primary: #2563eb; /* biru */
+  --secondary: #16a34a; /* hijau */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --muted: #1a1a1a;
+    --border: #333;
+    --primary: #3b82f6;
+    --secondary: #22c55e;
   }
+}
+
+/* 🔄 Reset umum */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
@@ -23,69 +39,15 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.5;
-
-  display: flex;
-  justify-content: center;   /* horizontal center */
-  align-items: flex-start;   /* biar scroll normal, bisa pakai center kalau mau benar2 tengah */
-  padding: 2rem;
+  line-height: 1.6;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
+/* 🔗 Link */
 a {
-  color: inherit;
+  color: var(--primary);
   text-decoration: none;
 }
 
-/* --- Layout wrapper --- */
-main {
-  max-width: 420px;         /* batasi lebar biar rapih */
-  width: 100%;
-  margin: 0 auto;
-}
-
-/* --- Card styling --- */
-.card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-/* --- Buttons --- */
-button {
-  display: block;
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-weight: 600;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-button.primary {
-  background: #2563eb;
-  color: #fff;
-}
-
-button.primary:hover {
-  background: #1e40af;
-}
-
-/* --- Typography --- */
-h1, h2 {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-p, span {
-  font-size: 14px;
+a:hover {
+  text-decoration: underline;
 }
