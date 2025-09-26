@@ -31,28 +31,111 @@ export default function Checkout() {
     }
   };
 
+  const goBackToMenu = () => {
+    window.location.href = "/select-items";
+  };
+
   return (
     <>
-      <div className="header">Millenium Jaya</div> {/* brand di atas */}
-      <div className="container">
-        <h1>Checkout</h1>
+      <nav className={styles.navbar}>
+        <div className={styles.navContainer}>
+          <div className={styles.brand}>
+            <div className={styles.brandIcon}>🍽️</div>
+            <h1 className={styles.brandName}>Millenium Jaya</h1>
+            <span className={styles.brandTagline}>Premium Dining</span>
+          </div>
+          
+          <div className={styles.cartWrapper}>
+            <div className={styles.cartIcon}>
+              <svg className={styles.cartSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="m1 1 4 4 12.68 3.17a2 2 0 0 1 1.32 2.23l-.84 5a2 2 0 0 1-2 1.6H6"></path>
+              </svg>
+              {cart.length > 0 && (
+                <span className={styles.cartBadge}>{cart.length}</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+      
+      <main className={styles.container}>
+        <div className={styles.titleSection}>
+          <h2 className={styles.pageTitle}>Checkout</h2>
+          <p className={styles.subtitle}>Review your order before payment</p>
+        </div>
+
         {cart.length === 0 ? (
-          <p>No items in cart.</p>
-        ) : (
-          <>
-            {cart.map((item, i) => (
-              <div key={i} className={styles.item}>
-                <span>{item.name}</span>
-                <span>Rp {item.price}</span>
-              </div>
-            ))}
-            <p className={styles.total}>Total: Rp {total}</p>
-            <button onClick={handleCheckout} className={styles.checkoutBtn}>
-              Continue to Payment →
+          <div className={styles.emptyCart}>
+            <div className={styles.emptyIcon}>🛒</div>
+            <h3 className={styles.emptyTitle}>Your cart is empty</h3>
+            <p className={styles.emptyText}>Add some delicious items to get started!</p>
+            <button onClick={goBackToMenu} className={styles.backToMenuBtn}>
+              <span className={styles.backIcon}>←</span>
+              Back to Menu
             </button>
-          </>
+          </div>
+        ) : (
+          <div className={styles.checkoutContent}>
+            <div className={styles.orderSummary}>
+              <h3 className={styles.summaryTitle}>Order Summary</h3>
+              
+              <div className={styles.itemsList}>
+                {cart.map((item, i) => (
+                  <div key={i} className={styles.item}>
+                    <div className={styles.itemInfo}>
+                      <div className={styles.itemImage}>🍽️</div>
+                      <div className={styles.itemDetails}>
+                        <span className={styles.itemName}>{item.name}</span>
+                        <span className={styles.itemCategory}>Main Course</span>
+                      </div>
+                    </div>
+                    <span className={styles.itemPrice}>Rp {item.price.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className={styles.totalSection}>
+                <div className={styles.totalRow}>
+                  <span className={styles.totalLabel}>Subtotal</span>
+                  <span className={styles.totalValue}>Rp {total.toLocaleString()}</span>
+                </div>
+                <div className={styles.totalRow}>
+                  <span className={styles.totalLabel}>Tax (10%)</span>
+                  <span className={styles.totalValue}>Rp {(total * 0.1).toLocaleString()}</span>
+                </div>
+                <div className={styles.finalTotal}>
+                  <span className={styles.finalLabel}>Total</span>
+                  <span className={styles.finalValue}>Rp {(total * 1.1).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.actionButtons}>
+              <button onClick={goBackToMenu} className={styles.backButton}>
+                <span className={styles.backIcon}>←</span>
+                Add More Items
+              </button>
+              
+              <button onClick={handleCheckout} className={styles.paymentButton}>
+                <div className={styles.paymentContent}>
+                  <span className={styles.paymentIcon}>💳</span>
+                  <div className={styles.paymentText}>
+                    <span className={styles.paymentLabel}>Continue to</span>
+                    <span className={styles.paymentAction}>Payment</span>
+                  </div>
+                  <div className={styles.paymentArrow}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
         )}
-      </div>
+      </main>
     </>
   );
 }
