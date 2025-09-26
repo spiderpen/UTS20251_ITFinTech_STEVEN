@@ -5,11 +5,19 @@ import styles from "../styles/checkout.module.css";
 export default function Checkout() {
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
+  const [quantities, setQuantities] = useState({});
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("cart") || "[]");
     setCart(stored);
     setTotal(stored.reduce((sum, item) => sum + item.price, 0));
+
+    // Initialize quantities from stored cart
+    const storedQuantities = {};
+    stored.forEach(item => {
+      storedQuantities[item._id] = (storedQuantities[item._id] || 0) + 1;
+    });
+    setQuantities(storedQuantities);
   }, []);
 
   // Function to get appropriate emoji based on category
@@ -31,7 +39,66 @@ export default function Checkout() {
     }
   };
 
+  // Update quantity for a product
+  const updateQuantity = (product, newQuantity) => {
+    const updatedQuantities = { ...quantities };
+
+    if (newQuantity <= 0) {
+      delete updatedQuantities[product._id];
+    } else {
+      updatedQuantities[product._id] = newQuantity;
+    }
+
+    setQuantities(updatedQuantities);
+
+    // Update cart based on quantities
+    const updatedCart = [];
+    Object.entries(updatedQuantities).forEach(([productId, qty]) => {
+      const productData = cart.find(item => item._id === productId) || 
+                         cart.find(item => item._id === productId);
+      
+      // If we can't find the product in current cart, get it from the original item
+      if (productData) {
+        for (let i = 0; i < qty; i++) {
+          updatedCart.push(productData);
+        }
+      }
+    });
+
+    setCart(updatedCart);
+    setTotal(updatedCart.reduce((sum, item) => sum + item.price, 0));
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
+
+  const increaseQuantity = (product) => {
+    const currentQty = quantities[product._id] || 0;
+    updateQuantity(product, currentQty + 1);
+  };
+
+  const decreaseQuantity = (product) => {
+    const currentQty = quantities[product._id] || 0;
+    if (currentQty > 0) {
+      updateQuantity(product, currentQty - 1);
+    }
+  };
+
+  // Get unique items for display
+  const getUniqueItems = () => {
+    const uniqueItems = {};
+    cart.forEach(item => {
+      if (!uniqueItems[item._id]) {
+        uniqueItems[item._id] = item;
+      }
+    });
+    return Object.values(uniqueItems);
+  };
+
   const handleCheckout = async () => {
+    if (cart.length === 0) {
+      alert("Cart is empty! Please add items before checkout.");
+      return;
+    }
+
     try {
       const res = await axios.post("/api/checkout", {
         items: cart,
@@ -103,16 +170,49 @@ export default function Checkout() {
               <h3 className={styles.summaryTitle}>Order Summary</h3>
               
               <div className={styles.itemsList}>
-                {cart.map((item, i) => (
-                  <div key={i} className={styles.item}>
+                {getUniqueItems().map((item) => (
+                  <div key={item._id} className={styles.item}>
                     <div className={styles.itemInfo}>
                       <div className={styles.itemImage}>{getCategoryEmoji(item.category)}</div>
                       <div className={styles.itemDetails}>
                         <span className={styles.itemName}>{item.name}</span>
                         <span className={styles.itemCategory}>{item.category || "Main Course"}</span>
+                        <div className={styles.itemPriceInfo}>
+                          <span className={styles.unitPrice}>Rp {item.price.toLocaleString()} each</span>
+                        </div>
                       </div>
                     </div>
-                    <span className={styles.itemPrice}>Rp {item.price.toLocaleString()}</span>
+                    
+                    <div className={styles.itemControls}>
+                      <div className={styles.quantityControls}>
+                        <button 
+                          className={styles.quantityButton}
+                          onClick={() => decreaseQuantity(item)}
+                          disabled={!quantities[item._id] || quantities[item._id] <= 0}
+                        >
+                          <svg className={styles.quantityIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M5 12h14"/>
+                          </svg>
+                        </button>
+
+                        <span className={styles.quantityDisplay}>
+                          {quantities[item._id] || 0}
+                        </span>
+
+                        <button 
+                          className={styles.quantityButton}
+                          onClick={() => increaseQuantity(item)}
+                        >
+                          <svg className={styles.quantityIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12 5v14M5 12h14"/>
+                          </svg>
+                        </button>
+                      </div>
+                      
+                      <div className={styles.itemTotalPrice}>
+                        Rp {((quantities[item._id] || 0) * item.price).toLocaleString()}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -136,7 +236,7 @@ export default function Checkout() {
                   <span className={styles.paymentIcon}>💳</span>
                   <div className={styles.paymentText}>
                     <span className={styles.paymentLabel}>Continue to</span>
-                    <span className={styles.paymentAction}>Payment</span>
+                    <span className={styles.paymentAction}>Payment ({cart.length} items)</span>
                   </div>
                   <div className={styles.paymentArrow}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

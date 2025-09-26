@@ -204,16 +204,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
+    padding: 1.5rem;
     background: var(--accent);
     border-radius: 12px;
     border: 1px solid var(--border);
+    gap: 1rem;
   }
   
   .itemInfo {
     display: flex;
     align-items: center;
     gap: 1rem;
+    flex: 1;
   }
   
   .itemImage {
@@ -227,6 +229,7 @@
   .itemDetails {
     display: flex;
     flex-direction: column;
+    gap: 0.25rem;
   }
   
   .itemName {
@@ -238,13 +241,84 @@
   .itemCategory {
     font-size: 0.875rem;
     color: var(--secondary);
-    margin-top: 0.125rem;
   }
   
-  .itemPrice {
+  .itemPriceInfo {
+    margin-top: 0.25rem;
+  }
+  
+  .unitPrice {
+    font-size: 0.8rem;
+    color: var(--secondary);
+    font-weight: 500;
+  }
+  
+  .itemControls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+  }
+  
+  .quantityControls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .quantityButton {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--primary);
+  }
+  
+  .quantityButton:hover:not(:disabled) {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: scale(1.05);
+  }
+  
+  .quantityButton:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--accent);
+    color: var(--secondary);
+  }
+  
+  .quantityIcon {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2.5;
+  }
+  
+  .quantityDisplay {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--foreground);
+    min-width: 20px;
+    text-align: center;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .itemTotalPrice {
     font-weight: 700;
     color: var(--foreground);
     font-size: 1.125rem;
+    text-align: right;
   }
   
   .totalSection {
@@ -408,7 +482,10 @@
     }
     
     .item {
-      padding: 0.75rem;
+      padding: 1rem;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
     }
     
     .itemInfo {
@@ -418,6 +495,36 @@
     .itemImage {
       font-size: 1.5rem;
       padding: 0.375rem;
+    }
+    
+    .itemControls {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .quantityControls {
+      gap: 0.5rem;
+      padding: 0.375rem;
+    }
+    
+    .quantityButton {
+      width: 28px;
+      height: 28px;
+    }
+    
+    .quantityIcon {
+      width: 12px;
+      height: 12px;
+    }
+    
+    .quantityDisplay {
+      font-size: 0.9rem;
+      padding: 0.125rem 0.375rem;
+    }
+    
+    .itemTotalPrice {
+      font-size: 1rem;
     }
   }
   
@@ -432,20 +539,35 @@
       align-items: center;
     }
     
-    .emptyCart {
-      padding: 2rem 1rem;
-    }
-    
     .item {
-      flex-direction: column;
-      gap: 0.75rem;
-      text-align: center;
+      padding: 0.75rem;
     }
     
     .itemInfo {
       flex-direction: column;
       text-align: center;
       gap: 0.5rem;
+    }
+    
+    .itemDetails {
+      align-items: center;
+      text-align: center;
+    }
+    
+    .itemControls {
+      width: 100%;
+      gap: 0.5rem;
+    }
+    
+    .quantityControls {
+      flex: 1;
+      justify-content: center;
+    }
+    
+    .itemTotalPrice {
+      text-align: center;
+      font-size: 1.125rem;
+      font-weight: 700;
     }
     
     .finalTotal {
