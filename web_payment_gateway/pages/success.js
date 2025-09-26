@@ -30,6 +30,25 @@ export default function Success() {
     localStorage.removeItem("checkoutId");
   }, []);
 
+  // Function to get appropriate emoji based on category
+  const getCategoryEmoji = (category) => {
+    if (!category) return "🍽️";
+    
+    const categoryLower = category.toLowerCase();
+    
+    if (categoryLower.includes("meal") || categoryLower.includes("food") || categoryLower.includes("main")) {
+      return "🍽️";
+    } else if (categoryLower.includes("drink") || categoryLower.includes("beverage")) {
+      return "🥤";
+    } else if (categoryLower.includes("snack") || categoryLower.includes("appetizer")) {
+      return "🍿";
+    } else if (categoryLower.includes("dessert") || categoryLower.includes("sweet")) {
+      return "🍰";
+    } else {
+      return "🍽️"; // default
+    }
+  };
+
   const goBackToMenu = () => {
     window.location.href = "/select-items";
   };
@@ -43,9 +62,22 @@ export default function Success() {
       <nav className={styles.navbar}>
         <div className={styles.navContainer}>
           <div className={styles.brand}>
-            <div className={styles.brandIcon}>🍽️</div>
-            <h1 className={styles.brandName}>Millenium Jaya</h1>
-            <span className={styles.brandTagline}>Premium Dining</span>
+            <div className={styles.brandIcon}>👑</div>
+            <div>
+              <h1 className={styles.brandName}>Millenium Jaya</h1>
+              <span className={styles.brandTagline}>Premium Dining</span>
+            </div>
+          </div>
+
+          <div className={styles.cartWrapper}>
+            <div className={styles.cartIcon}>
+              <svg className={styles.cartSvg} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="m1 1 4 4 12.68 3.17a2 2 0 0 1 1.32 2.23l-.84 5a2 2 0 0 1-2 1.6H6"></path>
+              </svg>
+              <span className={styles.cartBadge}>0</span>
+            </div>
           </div>
         </div>
       </nav>
@@ -82,10 +114,10 @@ export default function Success() {
                       {orderDetails.items?.map((item, i) => (
                         <div key={i} className={styles.item}>
                           <div className={styles.itemInfo}>
-                            <div className={styles.itemImage}>🍽️</div>
+                            <div className={styles.itemImage}>{getCategoryEmoji(item.category)}</div>
                             <div className={styles.itemDetails}>
                               <span className={styles.itemName}>{item.name}</span>
-                              <span className={styles.itemCategory}>Main Course</span>
+                              <span className={styles.itemCategory}>{item.category || "Main Course"}</span>
                             </div>
                           </div>
                           <span className={styles.itemPrice}>Rp {item.price?.toLocaleString()}</span>
