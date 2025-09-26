@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "mongoose": "^8.18.2",
+    "xendit-node": "^7.0.0"
+  }
+}
