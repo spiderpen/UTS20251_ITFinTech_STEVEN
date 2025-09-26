@@ -3,46 +3,75 @@ import axios from "axios";
 
 export default function Checkout() {
   const [cart, setCart] = useState([]);
-  const [total, setTotal] = useState(0);
+  const [subtotal, setSubtotal] = useState(0);
+  const taxRate = 0.1; // contoh 10%
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("cart") || "[]");
     setCart(stored);
-    setTotal(stored.reduce((sum, item) => sum + item.price, 0));
+    setSubtotal(stored.reduce((sum, i) => sum + i.price * (i.quantity || 1), 0));
   }, []);
+
+  const updateQty = (i, delta) => {
+    const updated = [...cart];
+    updated[i].quantity = Math.max(1, (updated[i].quantity || 1) + delta);
+    setCart(updated);
+    localStorage.setItem("cart", JSON.stringify(updated));
+    setSubtotal(updated.reduce((sum, it) => sum + it.price * it.quantity, 0));
+  };
 
   const handleCheckout = async () => {
     const res = await axios.post("/api/checkout", {
       items: cart,
-      totalPrice: total,
+      totalPrice: subtotal + subtotal * taxRate,
     });
-    localStorage.setItem("checkoutId", res.data._id);
+    localStorage.setItem("checkoutId", res.data.checkout._id);
     window.location.href = "/payment";
   };
 
+  const tax = subtotal * taxRate;
+  const total = subtotal + tax;
+
   return (
-    <div className="p-6">
+    <div className="p-4 max-w-md mx-auto">
+      <button onClick={() => history.back()} className="text-blue-600 mb-4">
+        ← Back
+      </button>
       <h1 className="text-xl font-bold mb-4">Checkout</h1>
-      {cart.length === 0 ? (
-        <p>No items in cart.</p>
-      ) : (
-        <>
-          {cart.map((item, i) => (
-            <div key={i} className="flex justify-between">
-              <span>{item.name}</span>
-              <span>Rp {item.price}</span>
-            </div>
-          ))}
-          <hr className="my-4" />
-          <p>Total: Rp {total}</p>
-          <button
-            onClick={handleCheckout}
-            className="mt-4 bg-green-500 text-white px-3 py-1 rounded"
-          >
-            Continue to Payment →
-          </button>
-        </>
-      )}
+
+      {cart.map((item, i) => (
+        <div key={i} className="flex justify-between items-center mb-3">
+          <span>{item.name}</span>
+          <div className="flex items-center">
+            <button
+              onClick={() => updateQty(i, -1)}
+              className="px-2 border rounded"
+            >
+              -
+            </button>
+            <span className="px-2">{item.quantity || 1}</span>
+            <button
+              onClick={() => updateQty(i, 1)}
+              className="px-2 border rounded"
+            >
+              +
+            </button>
+          </div>
+          <span>Rp {item.price}</span>
+        </div>
+      ))}
+
+      <hr className="my-3" />
+      <p>Subtotal: Rp {subtotal}</p>
+      <p>Tax (10%): Rp {tax}</p>
+      <p className="font-bold">Total: Rp {total}</p>
+
+      <button
+        onClick={handleCheckout}
+        className="mt-4 w-full bg-green-500 text-white py-2 rounded"
+      >
+        Continue to Payment →
+      </button>
     </div>
   );
 }

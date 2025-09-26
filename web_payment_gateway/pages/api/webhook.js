@@ -1,28 +1,35 @@
-import dbConnect from "../../lib/mongodb";
-import Payment from "../../models/Payment";
-import Checkout from "../../models/Checkout";
+import dbConnect from "../../lib/mongodb.js";
+import Payment from "../../models/Payment.js";
 
 export default async function handler(req, res) {
   await dbConnect();
 
   if (req.method === "POST") {
-    const event = req.body;
+    try {
+      const event = req.body;
 
-    if (event.status === "PAID") {
+      console.log("📩 Webhook diterima:", event);
+
+      // Data webhook Xendit punya `id` dan `status`
+      const { id, status } = event;
+
+      if (!id || !status) { 
+        return res.status(400).json({ error: "Invalid webhook payload" });
+      }
+
+      // Update status payment di MongoDB
       await Payment.findOneAndUpdate(
-        { xenditInvoiceId: event.id },
-        { status: "PAID" }
+        { xenditInvoiceId: id },
+        { status: status.toUpperCase() }, // status bisa PAID, PENDING, EXPIRED
+        { new: true }
       );
 
-      await Checkout.findOneAndUpdate(
-        { _id: event.external_id.replace("checkout-", "") },
-        { status: "PAID" }
-      );
+      res.status(200).json({ message: "Webhook processed successfully" });
+    } catch (err) {
+      console.error("❌ Error webhook:", err);
+      res.status(500).json({ error: err.message });
     }
-
-    res.status(200).json({ received: true });
   } else {
-    res.status(405).json({ message: "Method Not Allowed" });
+    res.status(405).json({ message: "Method not allowed" });
   }
 }
-    
