@@ -21,7 +21,7 @@ async function seed() {
       { name: "Coca Cola", category: "Drinks", price: 10000, image: "/coca_cola.jpeg" },
       { name: "Sprite", category: "Drinks", price: 9000, image: "/sprite.jpg" },
       { name: "Potato Chips", category: "Snacks", price: 15000, image: "/potatochips.jpg" },
-      { name: "Dubai Chocolate Bar", category: "Snacks", price: 12000, image: "/choco.jpeg" },
+      { name: "Chocolate Bar", category: "Snacks", price: 12000, image: "/choco.jpeg" },
       { name: "Burger", category: "Meals", price: 25000, image: "/burger.jpg" },
       { name: "Fried Rice", category: "Meals", price: 30000, image: "/friedrice.jpg" },
       { name: "Indomie", category: "Meals", price: 5000, image: "/indomie.jpg" }
