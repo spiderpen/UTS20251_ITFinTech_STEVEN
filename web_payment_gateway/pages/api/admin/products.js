@@ -1,6 +1,6 @@
-import dbConnect from "../../lib/mongodb";
-import Product from "../../models/Product";
-import { requireAuth } from "../../lib/adminAuth";
+import dbConnect from "../../../lib/mongodb";
+import Product from "../../../models/Product.js";
+import { requireAuth } from "../../../lib/adminAuth.js";
 
 async function handler(req, res) {
   await dbConnect();

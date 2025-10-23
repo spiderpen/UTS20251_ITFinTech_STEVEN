@@ -1,7 +1,7 @@
-import dbConnect from "../../lib/mongodb";
-import Admin from "../../models/Admin";
+import dbConnect from "../../../lib/mongodb";
+import Admin from "../../../models/Admin.js";
 import bcrypt from "bcryptjs";
-import { signToken } from "../../lib/jwt";
+import { signToken } from "../../../lib/jwt.js";
 
 export default async function handler(req, res) {
   await dbConnect();

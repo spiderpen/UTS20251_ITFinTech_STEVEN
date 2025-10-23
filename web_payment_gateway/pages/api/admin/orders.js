@@ -1,7 +1,7 @@
-import dbConnect from "../../lib/mongodb";
-import Order from "../../models/Order";
-import Checkout from "../../models/Checkout";
-import { requireAuth } from "../../lib/adminAuth";
+import dbConnect from "../../../lib/mongodb";
+import Order from "../../../models/Order.js";
+import Checkout from "../../../models/Checkout.js";
+import { requireAuth } from "../../../lib/adminAuth.js";
 
 async function handler(req, res) {
   await dbConnect();
