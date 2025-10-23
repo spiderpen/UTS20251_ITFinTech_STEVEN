@@ -11,7 +11,7 @@ async function handler(req, res) {
   }
 
   try {
-    const { period = "daily" } = req.query; // daily, weekly, monthly
+    const { period = "daily" } = req.query;
 
     // Get all paid orders
     let orders = await Order.find({ status: "PAID" });
@@ -37,7 +37,7 @@ async function handler(req, res) {
       let key;
 
       if (period === "daily") {
-        key = date.toISOString().split('T')[0]; // YYYY-MM-DD
+        key = date.toISOString().split('T')[0];
       } else if (period === "weekly") {
         const weekStart = new Date(date);
         weekStart.setDate(date.getDate() - date.getDay());
@@ -54,7 +54,6 @@ async function handler(req, res) {
       groupedData[key].orders += 1;
     });
 
-    // Convert to array and sort
     const chartData = Object.values(groupedData).sort((a, b) => 
       new Date(a.date) - new Date(b.date)
     );
@@ -65,6 +64,7 @@ async function handler(req, res) {
     orders.forEach(order => {
       if (order.items && Array.isArray(order.items)) {
         order.items.forEach(item => {
+          // ✅ Ambil nama produk dari field 'name'
           const productName = item.name || "Unknown Product";
           const quantity = item.quantity || 1;
           const price = item.price || 0;
@@ -86,18 +86,19 @@ async function handler(req, res) {
       }
     });
 
-    // Convert to array and sort by revenue (descending)
+    // Convert to array and sort by revenue
     const bestSellers = Object.values(productStats)
       .sort((a, b) => b.totalRevenue - a.totalRevenue)
-      .slice(0, 10); // Top 10 products
+      .slice(0, 10);
 
-    // Get summary stats
+    console.log("✅ Best Sellers:", bestSellers); // Debug log
+
     const stats = {
       totalRevenue,
       totalOrders: orders.length,
       averageOrderValue: orders.length > 0 ? totalRevenue / orders.length : 0,
       chartData,
-      bestSellers // Add best sellers data
+      bestSellers
     };
 
     res.status(200).json({ 

@@ -47,11 +47,13 @@ export default function AdminDashboard() {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem("adminToken");
-      const response = await fetch(`/api/admin/orders?status=${filter}`, {
+      const timestamp = new Date().getTime(); // Force refresh
+      const response = await fetch(`/api/admin/orders?status=${filter}&_t=${timestamp}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       const data = await response.json();
+      console.log("📦 Orders fetched:", data.orders?.length || 0);
       if (data.success) {
         setOrders(data.orders);
       }
@@ -242,6 +244,43 @@ export default function AdminDashboard() {
                 <Bar dataKey="orders" fill="#10B981" name="Orders" />
               </BarChart>
             </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Best Selling Products */}
+        {stats && stats.bestSellers && stats.bestSellers.length > 0 && (
+          <div style={{ backgroundColor: "white", borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", marginBottom: "32px" }}>
+            <div style={{ padding: "24px", borderBottom: "1px solid #E5E7EB" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: "700", color: "#111827" }}>🔥 Best Selling Products</h2>
+              <p style={{ fontSize: "14px", color: "#6B7280", marginTop: "4px" }}>Top products by revenue</p>
+            </div>
+            <div style={{ padding: "24px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "16px" }}>
+                {stats.bestSellers.slice(0, 5).map((product, index) => (
+                  <div key={index} style={{ padding: "16px", borderRadius: "8px", border: "1px solid #E5E7EB", transition: "all 0.2s" }} onMouseOver={(e) => e.currentTarget.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)"} onMouseOut={(e) => e.currentTarget.style.boxShadow = "none"}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                      <div style={{ width: "32px", height: "32px", borderRadius: "50%", backgroundColor: index === 0 ? "#FEF3C7" : index === 1 ? "#E0E7FF" : "#F3F4F6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: "700", color: index === 0 ? "#F59E0B" : index === 1 ? "#6366F1" : "#6B7280" }}>
+                        #{index + 1}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ fontSize: "14px", fontWeight: "600", color: "#111827", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{product.name}</h4>
+                        <p style={{ fontSize: "12px", color: "#6B7280", margin: 0 }}>{product.category}</p>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "12px", borderTop: "1px solid #E5E7EB" }}>
+                      <div>
+                        <p style={{ fontSize: "11px", color: "#6B7280", margin: 0 }}>Sold</p>
+                        <p style={{ fontSize: "16px", fontWeight: "700", color: "#111827", margin: "2px 0 0 0" }}>{product.totalQuantity}</p>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <p style={{ fontSize: "11px", color: "#6B7280", margin: 0 }}>Revenue</p>
+                        <p style={{ fontSize: "14px", fontWeight: "700", color: "#10B981", margin: "2px 0 0 0" }}>Rp {Math.round(product.totalRevenue / 1000)}k</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 

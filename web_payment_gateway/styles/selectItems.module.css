@@ -426,3 +426,305 @@
     border-radius: 8px;
     border: 2px solid var(--border);
   }
+
+  /* Existing styles... */
+
+/* Nav Actions Container */
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Admin Button */
+.adminButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.adminButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.adminButton:active {
+  transform: translateY(0);
+}
+
+.adminIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.adminText {
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navActions {
+    gap: 12px;
+  }
+
+  .adminButton {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .adminText {
+    display: none; /* Hide text on mobile, show only icon */
+  }
+
+  .adminIcon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .adminButton {
+    padding: 8px 12px;
+  }
+}
+
+/* Loading Container */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  gap: 16px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loadingText {
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Auth Buttons */
+.authButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loginButton,
+.registerButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.loginButton {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.loginButton:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.registerButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.registerButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.loginIcon,
+.registerIcon {
+  width: 16px;
+  height: 16px;
+}
+
+/* User Menu (when logged in) */
+.userMenu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.userButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: #F3F4F6;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.userButton:hover {
+  background: #E5E7EB;
+  transform: translateY(-2px);
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.userText {
+  font-weight: 600;
+  color: #111827;
+  font-size: 14px;
+}
+
+.logoutButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #FEE2E2;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logoutButton:hover {
+  background: #FECACA;
+  transform: translateY(-2px);
+}
+
+.logoutIcon {
+  width: 18px;
+  height: 18px;
+  stroke: #EF4444;
+}
+
+/* Guest Banner */
+.guestBanner {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.guestIcon {
+  font-size: 32px;
+}
+
+.guestText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.guestTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #78350F;
+}
+
+.guestSubtitle {
+  font-size: 14px;
+  color: #92400E;
+}
+
+.guestLoginBtn {
+  padding: 10px 24px;
+  background: #78350F;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.guestLoginBtn:hover {
+  background: #92400E;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(120, 53, 15, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .authButtons {
+    gap: 6px;
+  }
+
+  .loginButton,
+  .registerButton {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .loginButton span,
+  .registerButton span {
+    display: none;
+  }
+
+  .userText {
+    display: none;
+  }
+
+  .guestBanner {
+    flex-direction: column;
+    text-align: center;
+    padding: 16px;
+  }
+
+  .guestText {
+    align-items: center;
+  }
+}

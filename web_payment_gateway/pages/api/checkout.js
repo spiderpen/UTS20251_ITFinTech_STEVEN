@@ -16,12 +16,32 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: "Items and totalPrice required" });
     }
 
-    // ✅ Pastikan items punya name, category, price
-    const formattedItems = items.map(item => ({
-      name: item.name || "Unnamed Item",
-      category: item.category || "Main Course",
-      price: Number(item.price) || 0,
-    }));
+    // ✅ Format items dengan quantity yang benar
+    const itemsMap = {};
+    
+    items.forEach(item => {
+      // Gunakan _id sebagai key agar produk yang sama digabung
+      const key = item._id || item.name;
+      
+      if (!itemsMap[key]) {
+        itemsMap[key] = {
+          productId: item._id,
+          name: item.name || "Unnamed Item",
+          category: item.category || "Main Course",
+          price: Number(item.price) || 0,
+          quantity: 0,
+          image: item.image || "/placeholder.jpg"
+        };
+      }
+      
+      // Increment quantity
+      itemsMap[key].quantity += 1;
+    });
+
+    // Convert map to array
+    const formattedItems = Object.values(itemsMap);
+
+    console.log("✅ Formatted items:", formattedItems); // Debug log
 
     const checkout = await Checkout.create({
       items: formattedItems,
@@ -64,7 +84,10 @@ export default async function handler(req, res) {
 
     res.status(200).json({ success: true, checkout, invoice, payment });
   } catch (err) {
-    console.error(err.response?.data || err.message);
-    res.status(err.response?.status || 500).json({ success: false, error: err.response?.data || err.message });
+    console.error("❌ Checkout error:", err.response?.data || err.message);
+    res.status(err.response?.status || 500).json({ 
+      success: false, 
+      error: err.response?.data || err.message 
+    });
   }
 }

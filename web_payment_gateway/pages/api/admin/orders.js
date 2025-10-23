@@ -29,29 +29,52 @@ async function handler(req, res) {
         }
       }
 
-      // Try to get from Order collection first
-      let orders = await Order.find(query).sort({ createdAt: -1 });
+      // ✅ PERBAIKAN: Gabungkan data dari Order dan Checkout
+      let allOrders = [];
 
-      // If no orders in Order collection, try Checkout collection (backward compatibility)
-      if (orders.length === 0) {
-        const checkouts = await Checkout.find(query).sort({ _id: -1 });
-        
-        // Map Checkout to Order format
-        orders = checkouts.map(checkout => ({
-          _id: checkout._id,
-          items: checkout.items,
-          totalPrice: checkout.totalPrice,
-          status: checkout.status,
-          customerName: "Guest",
-          customerEmail: "guest@example.com",
-          createdAt: checkout._id.getTimestamp(),
-        }));
+      // Get from Order collection
+      const orders = await Order.find(query).sort({ createdAt: -1 });
+      allOrders = orders.map(order => ({
+        _id: order._id,
+        items: order.items,
+        totalPrice: order.totalPrice,
+        status: order.status,
+        customerName: order.customerName || "Guest",
+        customerEmail: order.customerEmail || "guest@example.com",
+        createdAt: order.createdAt,
+        paidAt: order.paidAt
+      }));
+
+      // Get from Checkout collection
+      const checkouts = await Checkout.find(query).sort({ _id: -1 });
+      const checkoutOrders = checkouts.map(checkout => ({
+        _id: checkout._id,
+        items: checkout.items,
+        totalPrice: checkout.totalPrice,
+        status: checkout.status,
+        customerName: "Guest",
+        customerEmail: "guest@example.com",
+        createdAt: checkout._id.getTimestamp(),
+        paidAt: null
+      }));
+
+      // Gabungkan dan urutkan berdasarkan tanggal terbaru
+      allOrders = [...allOrders, ...checkoutOrders].sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      // Filter berdasarkan status jika ada
+      if (status && status !== "ALL") {
+        allOrders = allOrders.filter(order => order.status === status);
       }
+
+      console.log("✅ Total orders found:", allOrders.length);
+      console.log("✅ Sample order:", allOrders[0]);
 
       res.status(200).json({ 
         success: true, 
-        orders,
-        count: orders.length 
+        orders: allOrders,
+        count: allOrders.length 
       });
     } catch (err) {
       console.error("❌ Get orders error:", err);
@@ -74,6 +97,8 @@ async function handler(req, res) {
         });
       }
 
+      console.log(`🔄 Updating order ${orderId} to ${status}`);
+
       // Try Order collection first
       let order = await Order.findByIdAndUpdate(
         orderId,
@@ -88,7 +113,10 @@ async function handler(req, res) {
       if (!order) {
         order = await Checkout.findByIdAndUpdate(
           orderId,
-          { status },
+          { 
+            status,
+            ...(status === "PAID" && { paidAt: new Date() })
+          },
           { new: true }
         );
       }
@@ -99,6 +127,8 @@ async function handler(req, res) {
           error: "Order not found" 
         });
       }
+
+      console.log("✅ Order updated:", order);
 
       res.status(200).json({ 
         success: true, 

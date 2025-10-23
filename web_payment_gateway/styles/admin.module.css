@@ -353,3 +353,38 @@
     grid-template-columns: 1fr;
   }
 }
+
+.successAlert {
+  background-color: #e6ffed;
+  border: 1px solid #28a745;
+  color: #155724;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.otpInfo {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.countdown {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.resendButton {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.resendButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
