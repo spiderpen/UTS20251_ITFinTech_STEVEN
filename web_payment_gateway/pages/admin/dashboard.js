@@ -320,7 +320,17 @@ export default function AdminDashboard() {
                       {order.customerName || "Guest"}
                     </td>
                     <td style={{ padding: "16px 24px", fontSize: "14px", color: "#6B7280" }}>
-                      {order.items?.length || 0} items
+                      <div style={{ position: "relative", cursor: "help" }} title={order.items?.map(item => `${item.name || "Unknown"} (${item.quantity || 1}x)`).join(", ")}>
+                        {(() => {
+                          const totalQty = order.items?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 0;
+                          return (
+                            <>
+                              <span style={{ fontWeight: "600", color: "#111827" }}>{totalQty}</span>
+                              <span> items</span>
+                            </>
+                          );
+                        })()}
+                      </div>
                     </td>
                     <td style={{ padding: "16px 24px", fontSize: "14px", color: "#111827", fontWeight: "600" }}>
                       Rp {order.totalPrice?.toLocaleString()}
