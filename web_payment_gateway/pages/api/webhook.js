@@ -1,6 +1,7 @@
 import dbConnect from "../../lib/mongodb";
 import Payment from "../../models/Payment";
 import Checkout from "../../models/Checkout";
+import { notifyCustomerPaymentSuccess, notifyAdminPaymentSuccess } from "../../lib/whatsapp";
 
 export default async function handler(req, res) {
   // Hanya izinkan POST
@@ -49,6 +50,34 @@ export default async function handler(req, res) {
       if (status === "PAID") checkout.paidAt = new Date();
       await checkout.save();
       console.log(`✅ Checkout ${checkout._id} updated to ${status}`);
+
+      // 🔔 KIRIM NOTIFIKASI WHATSAPP JIKA PAYMENT SUCCESS
+      if (status === "PAID") {
+        const orderData = {
+          orderId: checkout._id.toString().slice(-8).toUpperCase(),
+          items: checkout.items || [],
+          totalPrice: checkout.totalPrice || 0,
+          customerName: checkout.customerName || "Guest",
+          customerPhone: checkout.customerPhone || null,
+          customerEmail: checkout.customerEmail || "guest@example.com"
+        };
+
+        console.log("📱 Sending WhatsApp notifications for order:", orderData.orderId);
+
+        // Kirim notifikasi ke admin (non-blocking)
+        notifyAdminPaymentSuccess(orderData)
+          .then(() => console.log("✅ Admin notified successfully"))
+          .catch(err => console.error("❌ Failed to notify admin:", err.message));
+
+        // Kirim notifikasi ke customer jika ada nomor WA
+        if (checkout.customerPhone) {
+          notifyCustomerPaymentSuccess(checkout.customerPhone, orderData)
+            .then(() => console.log("✅ Customer notified successfully"))
+            .catch(err => console.error("❌ Failed to notify customer:", err.message));
+        } else {
+          console.warn("⚠️ Customer phone not available, skipping customer notification");
+        }
+      }
     }
 
     // Beri respons sukses ke Xendit

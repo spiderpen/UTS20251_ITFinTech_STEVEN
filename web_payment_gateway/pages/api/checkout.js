@@ -2,6 +2,7 @@ import dbConnect from "../../lib/mongodb";
 import Checkout from "../../models/Checkout";
 import Payment from "../../models/Payment";
 import axios from "axios";
+import { notifyAdminNewOrder, notifyCustomerCheckout } from "../../lib/whatsapp";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -10,17 +11,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method Not Allowed" });
 
   try {
-    const { items, totalPrice } = req.body;
+    const { items, totalPrice, customerName, customerPhone, customerEmail } = req.body;
 
     if (!items || !totalPrice) {
       return res.status(400).json({ success: false, error: "Items and totalPrice required" });
     }
 
-    // ✅ Format items dengan quantity yang benar
+    // Format items dengan quantity yang benar
     const itemsMap = {};
     
     items.forEach(item => {
-      // Gunakan _id sebagai key agar produk yang sama digabung
       const key = item._id || item.name;
       
       if (!itemsMap[key]) {
@@ -34,19 +34,20 @@ export default async function handler(req, res) {
         };
       }
       
-      // Increment quantity
       itemsMap[key].quantity += 1;
     });
 
-    // Convert map to array
     const formattedItems = Object.values(itemsMap);
 
-    console.log("✅ Formatted items:", formattedItems); // Debug log
+    console.log("✅ Formatted items:", formattedItems);
 
     const checkout = await Checkout.create({
       items: formattedItems,
       totalPrice: Number(totalPrice),
       status: "PENDING",
+      customerName: customerName || "Guest",
+      customerEmail: customerEmail || "guest@example.com",
+      customerPhone: customerPhone || null
     });
 
     const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -60,7 +61,7 @@ export default async function handler(req, res) {
       {
         external_id: `checkout-${checkout._id}-${Date.now()}`,
         amount: Number(totalPrice),
-        payer_email: "customer@example.com",
+        payer_email: customerEmail || "customer@example.com",
         description: `Payment for Millenium Jaya - Order ${checkout._id.toString().slice(-8).toUpperCase()}`,
         currency: "IDR",
         success_redirect_url: successUrl,
@@ -81,6 +82,28 @@ export default async function handler(req, res) {
       status: invoice.status || "PENDING",
       expiryDate: invoice.expiry_date ? new Date(invoice.expiry_date) : undefined,
     });
+
+    // 🔔 KIRIM NOTIFIKASI WHATSAPP
+    const orderData = {
+      orderId: checkout._id.toString().slice(-8).toUpperCase(),
+      items: formattedItems,
+      totalPrice: Number(totalPrice),
+      customerName: customerName || "Guest",
+      customerPhone: customerPhone || null,
+      customerEmail: customerEmail || "guest@example.com"
+    };
+
+    // Kirim ke admin
+    notifyAdminNewOrder(orderData).catch(err => 
+      console.error("Failed to notify admin:", err)
+    );
+
+    // Kirim ke customer (jika ada nomor)
+    if (customerPhone) {
+      notifyCustomerCheckout(customerPhone, orderData).catch(err => 
+        console.error("Failed to notify customer:", err)
+      );
+    }
 
     res.status(200).json({ success: true, checkout, invoice, payment });
   } catch (err) {

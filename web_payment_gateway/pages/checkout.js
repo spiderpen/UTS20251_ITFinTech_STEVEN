@@ -6,6 +6,11 @@ export default function Checkout() {
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
   const [quantities, setQuantities] = useState({});
+  
+  // Customer info state
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -18,6 +23,14 @@ export default function Checkout() {
       storedQuantities[item._id] = (storedQuantities[item._id] || 0) + 1;
     });
     setQuantities(storedQuantities);
+
+    // Load customer data from localStorage if logged in
+    const userData = JSON.parse(localStorage.getItem("userData") || "null");
+    if (userData) {
+      setCustomerName(userData.name || "");
+      setCustomerEmail(userData.email || "");
+      setCustomerPhone(userData.phone || "");
+    }
   }, []);
 
   // Function to get appropriate emoji based on category
@@ -99,10 +112,25 @@ export default function Checkout() {
       return;
     }
 
+    // Validasi customer info
+    if (!customerName || !customerPhone) {
+      alert("Please fill in your name and WhatsApp number to continue.");
+      return;
+    }
+
+    // Validasi format nomor WA
+    if (!customerPhone.startsWith("62")) {
+      alert("WhatsApp number must start with 62 (e.g., 628123456789)");
+      return;
+    }
+
     try {
       const res = await axios.post("/api/checkout", {
         items: cart,
         totalPrice: total,
+        customerName,
+        customerPhone,
+        customerEmail: customerEmail || "guest@example.com"
       });
 
       if (res.data.success) {
@@ -169,6 +197,75 @@ export default function Checkout() {
           </div>
         ) : (
           <div className={styles.checkoutContent}>
+            {/* Customer Information Form */}
+            <div className={styles.customerInfoCard}>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardHeaderIcon}>📱</div>
+                <div>
+                  <h3 className={styles.cardTitle}>Contact Information</h3>
+                  <p className={styles.cardSubtitle}>We'll send order updates via WhatsApp</p>
+                </div>
+              </div>
+              
+              <div className={styles.formGrid}>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>
+                    Name <span className={styles.required}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className={styles.formInput}
+                    placeholder="Enter your name"
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>
+                    WhatsApp Number <span className={styles.required}>*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    className={styles.formInput}
+                    placeholder="628123456789"
+                    required
+                  />
+                  <small className={styles.formHint}>
+                    Format: 628xxxxxxxxx (without +)
+                  </small>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>
+                    Email <span className={styles.optional}>(Optional)</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    className={styles.formInput}
+                    placeholder="your@email.com"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.infoNotice}>
+                <svg className={styles.infoIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span className={styles.infoText}>
+                  You'll receive order confirmation and payment status updates via WhatsApp
+                </span>
+              </div>
+            </div>
+
+            {/* Order Summary */}
             <div className={styles.orderSummary}>
               <h3 className={styles.summaryTitle}>Order Summary</h3>
               

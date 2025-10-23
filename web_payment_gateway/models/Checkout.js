@@ -23,6 +23,10 @@ const CheckoutSchema = new mongoose.Schema({
     type: String,
     default: "guest@example.com"
   },
+  customerPhone: {
+    type: String,
+    default: null
+  },
   createdAt: { 
     type: Date, 
     default: Date.now 
