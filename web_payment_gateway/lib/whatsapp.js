@@ -5,8 +5,8 @@ const FONNTE_TOKEN = process.env.FONNTE_TOKEN;
 
 /**
  * Kirim notifikasi WhatsApp
- * @param {6282249419509} phone - Nomor WhatsApp (format: 62xxx)
- * @param {kamu keren} message - Pesan yang akan dikirim
+ * @param {string} phone - Nomor WhatsApp (format: 62xxx)
+ * @param {string} message - Pesan yang akan dikirim
  */
 export async function sendWhatsApp(phone, message) {
   try {
@@ -41,7 +41,7 @@ export async function sendWhatsApp(phone, message) {
  * Format pesan notifikasi checkout
  */
 export function formatCheckoutMessage(orderData) {
-  const { orderId, items, totalPrice, customerName, customerPhone } = orderData;
+  const { orderId, items, totalPrice, customerName, customerPhone, paymentUrl } = orderData;
   
   let itemsList = "";
   items.forEach((item, index) => {
@@ -62,7 +62,7 @@ ${itemsList}
 
 ⏳ Status: Menunggu Pembayaran
 
-Terima kasih! 🙏`;
+${paymentUrl ? `🔗 *Bayar Sekarang:*\n${paymentUrl}\n\n` : ''}Terima kasih! 🙏`;
 }
 
 /**
@@ -103,8 +103,31 @@ export async function notifyAdminNewOrder(orderData) {
     return;
   }
 
-  const message = formatCheckoutMessage(orderData);
-  return await sendWhatsApp(adminPhone, message);
+  // Format pesan khusus untuk admin dengan link payment
+  const { orderId, items, totalPrice, customerName, customerPhone, paymentUrl } = orderData;
+  
+  let itemsList = "";
+  items.forEach((item, index) => {
+    const qty = item.quantity || 1;
+    const price = item.price || 0;
+    itemsList += `${index + 1}. ${item.name} (${qty}x) - Rp ${(qty * price).toLocaleString()}\n`;
+  });
+
+  const adminMessage = `🔔 *PESANAN BARU - Millenium Jaya*
+
+📋 Order ID: #${orderId}
+👤 Customer: ${customerName || "Guest"}
+📱 Phone: ${customerPhone || "-"}
+
+🛒 *Detail Pesanan:*
+${itemsList}
+💰 *Total: Rp ${totalPrice.toLocaleString()}*
+
+⏳ Status: Menunggu Pembayaran
+
+${paymentUrl ? `🔗 *Link Payment:*\n${paymentUrl}\n\n` : ''}Pantau pembayaran di dashboard admin.`;
+
+  return await sendWhatsApp(adminPhone, adminMessage);
 }
 
 /**
@@ -144,11 +167,14 @@ export async function notifyAdminPaymentSuccess(orderData) {
     return;
   }
 
-  const message = `💰 *PEMBAYARAN DITERIMA*
+  const message = `💰 *PEMBAYARAN DITERIMA - Millenium Jaya*
 
-Order #${orderData.orderId} telah dibayar!
-Customer: ${orderData.customerName || "Guest"}
-Total: Rp ${orderData.totalPrice.toLocaleString()}
+📋 Order #${orderData.orderId} telah dibayar!
+👤 Customer: ${orderData.customerName || "Guest"}
+📱 Phone: ${orderData.customerPhone || "-"}
+💰 Total: Rp ${orderData.totalPrice.toLocaleString()}
+
+✅ Status: LUNAS
 
 Segera proses pesanan! 🚀`;
 
