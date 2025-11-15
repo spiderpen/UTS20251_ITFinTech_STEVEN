@@ -149,7 +149,7 @@ export default function AdminDashboard() {
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ fontSize: "32px" }}>👑</div>
             <div>
-              <h2 style={{ fontSize: "18px", fontWeight: "700", margin: 0 }}>Millenium Jaya</h2>
+              <h2 style={{ fontSize: "18px", fontWeight: "700", margin: 0 }}>pudinginaja</h2>
               <p style={{ fontSize: "12px", color: "#9CA3AF", margin: 0 }}>Admin Panel</p>
             </div>
           </div>

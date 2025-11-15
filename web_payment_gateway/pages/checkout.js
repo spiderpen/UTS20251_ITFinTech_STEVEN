@@ -154,13 +154,19 @@ export default function Checkout() {
 
   return (
     <>
-      <nav className={styles.navbar}>
+     <nav className={styles.navbar}>
         <div className={styles.navContainer}>
           <div className={styles.brand}>
-            <div className={styles.brandIcon}>👑</div>
+            <div className={styles.brandIconWrapper}>
+              <img
+                src="/pudinginAjaLogo.jpg"
+                alt="pudinginajalogo"
+                className={styles.logo}
+              />
+            </div>
             <div>
-              <h1 className={styles.brandName}>Millenium Jaya</h1>
-              <span className={styles.brandTagline}>Premium Dining</span>
+              <h1 className={styles.brandName}>pudinginaja</h1>
+              <span className={styles.brandTagline}>PUDDING CAKE & HAMPERS</span>
             </div>
           </div>
 
