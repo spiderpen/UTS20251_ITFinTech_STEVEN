@@ -1,169 +1,174 @@
+// pages/api/checkout.js
 import dbConnect from "../../lib/mongodb";
 import Checkout from "../../models/Checkout";
 import Payment from "../../models/Payment";
-import axios from "axios";
+import { createMidtransTransaction } from "../../lib/midtrans";
 import { notifyAdminNewOrder, notifyCustomerCheckout } from "../../lib/whatsapp";
+import { v4 as uuidv4 } from "uuid";
 
 export default async function handler(req, res) {
   await dbConnect();
 
-  if (req.method !== "POST") 
+  if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
+  }
 
   try {
     const { items, totalPrice, customerName, customerPhone, customerEmail } = req.body;
 
-    console.log("📦 Checkout request received:", {
+    console.log("📦 Checkout request:", {
       itemsCount: items?.length,
       totalPrice,
       customerName,
       customerPhone,
-      customerEmail
+      customerEmail,
     });
 
-    // Validasi input
+    // -------------------------
+    // VALIDATION
+    // -------------------------
     if (!items || !Array.isArray(items) || items.length === 0) {
-      console.error("❌ Invalid items:", items);
-      return res.status(400).json({ 
-        success: false, 
-        error: "Items is required and must be a non-empty array" 
-      });
+      return res.status(400).json({ success: false, error: "Cart is empty." });
     }
 
-    if (!totalPrice || totalPrice <= 0) {
-      console.error("❌ Invalid totalPrice:", totalPrice);
-      return res.status(400).json({ 
-        success: false, 
-        error: "Total price is required and must be greater than 0" 
-      });
+    if (!totalPrice || Number(totalPrice) <= 0) {
+      return res.status(400).json({ success: false, error: "Invalid total price." });
     }
 
-    // Format items dengan quantity yang benar
+    // -------------------------
+    // FORMAT ITEMS → quantity
+    // -------------------------
     const itemsMap = {};
-    
-    items.forEach(item => {
-      if (!item._id && !item.name) {
-        console.warn("⚠️ Item without _id or name:", item);
-        return;
-      }
 
-      const key = item._id || item.name;
-      
-      if (!itemsMap[key]) {
-        itemsMap[key] = {
+    items.forEach((item) => {
+      const id = item._id || item.name;
+      if (!id) return;
+
+      if (!itemsMap[id]) {
+        itemsMap[id] = {
           productId: item._id || "",
-          name: item.name || "Unnamed Item",
+          name: item.name,
           category: item.category || "Main Course",
-          price: Number(item.price) || 0,
+          price: Number(item.price),
           quantity: 0,
-          image: item.image || "/placeholder.jpg"
+          image: item.image || "",
         };
       }
-      
-      itemsMap[key].quantity += 1;
+
+      itemsMap[id].quantity += 1;
     });
 
     const formattedItems = Object.values(itemsMap);
 
-    if (formattedItems.length === 0) {
-      console.error("❌ No valid items after formatting");
-      return res.status(400).json({ 
-        success: false, 
-        error: "No valid items found" 
-      });
-    }
+    console.log("🧾 Formatted items:", formattedItems);
 
-    console.log("✅ Formatted items:", formattedItems);
-
+    // -------------------------
+    // CREATE CHECKOUT RECORD
+    // -------------------------
     const checkout = await Checkout.create({
       items: formattedItems,
       totalPrice: Number(totalPrice),
       status: "PENDING",
       customerName: customerName || "Guest",
-      customerEmail: customerEmail || "guest@example.com",
-      customerPhone: customerPhone || null
+      customerEmail: customerEmail || "guest@pudinginaja.com",
+      customerPhone: customerPhone || "",
     });
 
-    console.log("✅ Checkout created:", checkout._id);
+    console.log("📝 Checkout created:", checkout._id);
 
-    const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    // -------------------------
+    // UNIQUE ORDER ID (UUID)
+    // -------------------------
+    const midtransOrderId = `ORDER-${uuidv4()}`;
 
-    const successUrl = `${BASE_URL}/success?checkoutId=${checkout._id}`;
-    const failureUrl = `${BASE_URL}/checkout`;
+    console.log("🆔 Generated Order ID:", midtransOrderId);
 
-    // Buat invoice Xendit
-    console.log("💳 Creating Xendit invoice...");
-    
-    const invoiceRes = await axios.post(
-      "https://api.xendit.co/v2/invoices",
-      {
-        external_id: `checkout-${checkout._id}-${Date.now()}`,
-        amount: Number(totalPrice),
-        payer_email: customerEmail || "customer@example.com",
-        description: `Payment for Millenium Jaya - Order ${checkout._id.toString().slice(-8).toUpperCase()}`,
-        currency: "IDR",
-        success_redirect_url: successUrl,
-        failure_redirect_url: failureUrl,
-      },
-      {
-        auth: { username: process.env.XENDIT_SECRET_KEY, password: "" },
-      }
-    );
+    // -------------------------
+    // MIDTRANS TRANSACTION
+    // -------------------------
+    let midtransTransaction;
+    try {
+      midtransTransaction = await createMidtransTransaction({
+        orderId: midtransOrderId,
+        totalPrice,
+        customerName,
+        customerEmail,
+        customerPhone,
+        items: formattedItems,
+      });
+    } catch (err) {
+      console.error("❌ Midtrans error:", err.ApiResponse || err);
 
-    const invoice = invoiceRes.data;
-    console.log("✅ Xendit invoice created:", invoice.id);
-    console.log("🔗 Payment URL:", invoice.invoice_url);
+      await Checkout.findByIdAndUpdate(checkout._id, { status: "FAILED" });
 
+      return res.status(502).json({
+        success: false,
+        error:
+          err.ApiResponse?.status_message ||
+          err.message ||
+          "Failed to create Midtrans transaction",
+      });
+    }
+
+    console.log("💳 Midtrans OK → Redirect:", midtransTransaction.redirectUrl);
+
+    // -------------------------
+    // SAVE PAYMENT RECORD
+    // -------------------------
     const payment = await Payment.create({
       checkoutId: checkout._id,
-      xenditInvoiceId: invoice.id,
-      xenditInvoiceUrl: invoice.invoice_url,
+      midtransOrderId,
+      midtransSnapToken: midtransTransaction.token,
+      midtransSnapUrl: midtransTransaction.redirectUrl,
       amount: Number(totalPrice),
-      status: invoice.status || "PENDING",
-      expiryDate: invoice.expiry_date ? new Date(invoice.expiry_date) : undefined,
+      status: "PENDING",
+      expiryDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
     });
 
-    console.log("✅ Payment record created:", payment._id);
+    console.log("💰 Payment created:", payment._id);
 
-    // 🔔 KIRIM NOTIFIKASI WHATSAPP
+    // -------------------------
+    // SEND WHATSAPP (non-blocking)
+    // -------------------------
     const orderData = {
       orderId: checkout._id.toString().slice(-8).toUpperCase(),
       items: formattedItems,
-      totalPrice: Number(totalPrice),
-      customerName: customerName || "Guest",
-      customerPhone: customerPhone || null,
-      customerEmail: customerEmail || "guest@example.com",
-      paymentUrl: invoice.invoice_url // ✅ TAMBAHKAN PAYMENT URL
+      totalPrice,
+      customerName,
+      customerPhone,
+      customerEmail,
+      paymentUrl: midtransTransaction.redirectUrl,
     };
 
-    console.log("📱 Preparing to send WhatsApp notifications...");
-
-    // Kirim ke admin (non-blocking)
     if (process.env.FONNTE_TOKEN) {
-      notifyAdminNewOrder(orderData)
-        .then(() => console.log("✅ Admin notified successfully"))
-        .catch(err => console.error("❌ Failed to notify admin:", err.message));
+      notifyAdminNewOrder(orderData).catch((e) =>
+        console.error("WA admin error:", e.message)
+      );
 
-      // Kirim ke customer (jika ada nomor)
       if (customerPhone) {
-        notifyCustomerCheckout(customerPhone, orderData)
-          .then(() => console.log("✅ Customer notified successfully"))
-          .catch(err => console.error("❌ Failed to notify customer:", err.message));
-      } else {
-        console.warn("⚠️ Customer phone not provided, skipping customer notification");
+        notifyCustomerCheckout(customerPhone, orderData).catch((e) =>
+          console.error("WA customer error:", e.message)
+        );
       }
-    } else {
-      console.warn("⚠️ FONNTE_TOKEN not configured, skipping WhatsApp notifications");
     }
 
-    res.status(200).json({ success: true, checkout, invoice, payment });
+    // -------------------------
+    // SUCCESS RESPONSE
+    // -------------------------
+    return res.status(200).json({
+      success: true,
+      checkout,
+      payment: {
+        snapToken: midtransTransaction.token,
+        redirectUrl: midtransTransaction.redirectUrl,
+      },
+    });
   } catch (err) {
-    console.error("❌ Checkout error:", err.response?.data || err.message);
-    console.error("Error stack:", err.stack);
-    
-    res.status(err.response?.status || 500).json({ 
-      success: false, 
-      error: err.response?.data?.message || err.message || "Checkout failed"
+    console.error("❌ API Error:", err);
+
+    return res.status(500).json({
+      success: false,
+      error: err.message || "Checkout failed",
     });
   }
 }

@@ -16,12 +16,14 @@
     "cookie": "^1.0.2",
     "dotenv": "^17.2.2",
     "jsonwebtoken": "^9.0.2",
+    "micro": "^10.0.1",
     "midtrans-client": "^1.4.3",
     "mongoose": "^8.18.2",
     "next": "^15.5.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "recharts": "^2.15.4",
+    "uuid": "^13.0.0",
     "xendit-node": "^7.0.0"
   }
 }
