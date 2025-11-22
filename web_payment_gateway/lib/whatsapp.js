@@ -50,7 +50,7 @@ export function formatCheckoutMessage(orderData) {
     itemsList += `${index + 1}. ${item.name} (${qty}x) - Rp ${(qty * price).toLocaleString()}\n`;
   });
 
-  return `🔔 *PESANAN BARU - Millenium Jaya*
+  return `🔔 *PESANAN BARU - pudinginaja*
 
 📋 Order ID: #${orderId}
 👤 Customer: ${customerName || "Guest"}
@@ -77,7 +77,7 @@ export function formatPaymentSuccessMessage(orderData) {
     itemsList += `${index + 1}. ${item.name} (${qty}x)\n`;
   });
 
-  return `✅ *PEMBAYARAN BERHASIL - Millenium Jaya*
+  return `✅ *PEMBAYARAN BERHASIL - pudinginaja*
 
 📋 Order ID: #${orderId}
 👤 Customer: ${customerName || "Guest"}
@@ -167,7 +167,7 @@ export async function notifyAdminPaymentSuccess(orderData) {
     return;
   }
 
-  const message = `💰 *PEMBAYARAN DITERIMA - Millenium Jaya*
+  const message = `💰 *PEMBAYARAN DITERIMA - pudinginaja*
 
 📋 Order #${orderData.orderId} telah dibayar!
 👤 Customer: ${orderData.customerName || "Guest"}
