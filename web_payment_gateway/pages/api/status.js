@@ -1,6 +1,6 @@
-import dbConnect from "../../../lib/mongodb";
-import Payment from "../../../models/Payment";
-import Checkout from "../../../models/Checkout";
+import dbConnect from "../../lib/mongodb";
+import Payment from "../../models/Payment";
+import Checkout from "../../models/Checkout";
 import axios from "axios";
 
 export default async function handler(req, res) {
