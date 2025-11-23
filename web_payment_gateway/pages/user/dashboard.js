@@ -198,7 +198,7 @@ export default function UserDashboard() {
 
       {/* Footer */}
       <footer className={styles.footer}>
-        <p className={styles.footerText}>© 2025 Millenium Jaya. All rights reserved.</p>
+        <p className={styles.footerText}>© 2025 pudinginaja. All rights reserved.</p>
       </footer>
     </div>
   );

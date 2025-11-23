@@ -112,7 +112,7 @@ export default function AdminLogin() {
         <div className={styles.loginHeader}>
           <div className={styles.loginIcon}>🔐</div>
           <h1 className={styles.loginTitle}>Admin Login</h1>
-          <p className={styles.loginSubtitle}>Millenium Jaya Dashboard</p>
+          <p className={styles.loginSubtitle}>pudinginaja Dashboard</p>
         </div>
 
         {step === 1 ? (
