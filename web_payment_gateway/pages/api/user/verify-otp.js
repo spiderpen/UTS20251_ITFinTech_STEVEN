@@ -2,7 +2,7 @@
 import dbConnect from "../../../lib/mongodb";
 import User from "../../../models/User";
 import jwt from "jsonwebtoken";
-import cookie from "cookie";
+import { serialize } from "cookie";
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
     // Simpan token ke cookie (agar bisa diakses frontend)
     res.setHeader(
       "Set-Cookie",
-      cookie.serialize("userToken", token, {
+      serialize("userToken", token, {  
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
