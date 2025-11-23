@@ -4,6 +4,9 @@ import { v4 as uuidv4 } from "uuid";
 const isProduction = process.env.MIDTRANS_IS_PRODUCTION === "true";
 
 console.log("is production mode :", isProduction);
+console.log("CLIENT KEY:", process.env.MIDTRANS_CLIENT_KEY);
+console.log("SERVER KEY:", process.env.MIDTRANS_SERVER_KEY);
+
 
 // Snap instance
 export const snap = new midtransClient.Snap({
