@@ -16,55 +16,68 @@ export const config = {
 export default async function handler(req, res) {
   await dbConnect();
 
-  if (req.method !== "POST") return res.status(405).send("Method not allowed");
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
+  }
 
   try {
-    // RAW body → diperlukan Midtrans
+    // Ambil rawBody dari Midtrans (WAJIB)
     const rawBody = (await buffer(req)).toString();
     const notification = JSON.parse(rawBody);
 
-    console.log("📩 Midtrans Notification:", notification);
+    console.log("📩 Midtrans Notification Received:", notification);
 
     const orderId = notification.order_id;
 
-    // Ambil status dari Midtrans
-    const status = await coreApi.transaction.status(orderId);
-    console.log("📊 Status:", status);
+    // Ambil status terbaru dari Midtrans
+    const statusResponse = await coreApi.transaction.status(orderId);
+    const { transaction_status, fraud_status } = statusResponse;
 
+    console.log("📊 Midtrans Status Response:", statusResponse);
+
+    // Mapping status
     let mappedStatus = "PENDING";
-    const t = status.transaction_status;
 
-    if (t === "settlement" || t === "capture") mappedStatus = "PAID";
-    else if (t === "expire") mappedStatus = "EXPIRED";
-    else if (t === "cancel" || t === "deny") mappedStatus = "FAILED";
+    if (transaction_status === "capture" && fraud_status === "accept") {
+      mappedStatus = "PAID";
+    } else if (transaction_status === "settlement") {
+      mappedStatus = "PAID";
+    } else if (transaction_status === "expire") {
+      mappedStatus = "EXPIRED";
+    } else if (
+      transaction_status === "cancel" ||
+      transaction_status === "deny"
+    ) {
+      mappedStatus = "FAILED";
+    }
 
-    // Update PAYMENT
+    // Update Payment
     const payment = await Payment.findOneAndUpdate(
       { midtransOrderId: orderId },
       {
         status: mappedStatus,
-        paymentMethod: status.payment_type,
-        midtransTransactionId: status.transaction_id,
+        paymentMethod: statusResponse.payment_type,
+        midtransTransactionId: statusResponse.transaction_id,
         paidAt: mappedStatus === "PAID" ? new Date() : null
       },
       { new: true }
     );
 
     if (!payment) {
-      console.log("⚠️ Payment not found");
+      console.log("⚠️ PAYMENT record not found for:", orderId);
       return res.status(404).json({ success: false });
     }
 
-    // Update CHECKOUT
+    // Update Checkout
     const checkout = await Checkout.findByIdAndUpdate(
       payment.checkoutId,
-      { status: mappedStatus },
+      { status: mappedStatus, paidAt: mappedStatus === "PAID" ? new Date() : null },
       { new: true }
     );
 
-    console.log("✅ Updated Checkout + Payment");
+    console.log("✅ Payment & Checkout Updated:", mappedStatus);
 
-    // 🔥 Kirim WA jika berhasil bayar
+    // KIRIM WA HANYA JIKA SUDAH BAYAR
     if (mappedStatus === "PAID") {
       const orderData = {
         orderId: checkout._id.toString().slice(-8).toUpperCase(),
@@ -74,22 +87,22 @@ export default async function handler(req, res) {
         customerPhone: checkout.customerPhone
       };
 
-      // WA ke Customer
+      // Kirim WA ke Customer
       if (checkout.customerPhone) {
         notifyCustomerPaymentSuccess(checkout.customerPhone, orderData)
-          .then(() => console.log("📱 Customer WA sent"))
-          .catch(err => console.error("❌ WA customer error:", err));
+          .then(() => console.log("📱 WhatsApp sent to customer"))
+          .catch((err) => console.error("❌ WA customer error:", err));
       }
 
-      // WA ke Admin
+      // Kirim WA ke Admin
       notifyAdminPaymentSuccess(orderData)
-        .then(() => console.log("📱 Admin WA sent"))
-        .catch(err => console.error("❌ WA admin error:", err));
+        .then(() => console.log("📱 WhatsApp sent to admin"))
+        .catch((err) => console.error("❌ WA admin error:", err));
     }
 
     return res.status(200).json({ success: true });
   } catch (err) {
-    console.error("❌ Webhook error:", err);
+    console.error("❌ Webhook Error:", err);
     return res.status(500).json({ success: false });
   }
 }
