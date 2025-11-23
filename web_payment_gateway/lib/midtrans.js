@@ -7,13 +7,13 @@ console.log("is production mode :", isProduction);
 
 // Snap instance
 export const snap = new midtransClient.Snap({
-  isProduction: isProduction,
+  isProduction: true,
   serverKey: process.env.MIDTRANS_SERVER_KEY,
 });
 
 // Core API instance
 export const coreApi = new midtransClient.CoreApi({
-  isProduction: isProduction,
+  isProduction: true,
   serverKey: process.env.MIDTRANS_SERVER_KEY,
 });
 
